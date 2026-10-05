@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101310" />
+    <meta name="description" content="ChronosOps AI — operational time-series intelligence for teams that run important systems." />
+    <title>ChronosOps AI | Operational intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <nav class="topbar">
+      <div class="shell topbar-inner">
+        <a class="brand" href="/" aria-label="ChronosOps AI home">
+          <span class="brand-mark"><span></span><span></span><span></span></span>
+          <span>Chronos<span class="brand-accent">Ops</span> <em>AI</em></span>
+        </a>
+        <div class="topbar-meta">
+          <span class="live-dot"></span>
+          <span>Local intelligence node</span>
+          <span class="topbar-divider"></span>
+          <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+            <span class="theme-icon">◐</span><span id="themeLabel">Dark mode</span>
+          </button>
+          <span class="topbar-divider"></span>
+          <a href="https://github.com/Yog-esh06/ChronoOps-AI" target="_blank" rel="noreferrer">View repository ↗</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="kicker"><span class="kicker-line"></span>Operational signal, decoded</div>
+          <h1>See the next failure<br /><span>before it becomes noise.</span></h1>
+          <p class="hero-lede">ChronosOps turns messy operational telemetry into a decision surface: trustworthy data checks, forecast benchmarks, anomaly evidence, and ranked contributing signals.</p>
+          <div class="hero-points">
+            <span><b>01</b> Profile</span>
+            <span><b>02</b> Forecast</span>
+            <span><b>03</b> Explain</span>
+          </div>
+        </div>
+        <div class="hero-orbit" aria-hidden="true">
+          <div class="orbit orbit-one"></div>
+          <div class="orbit orbit-two"></div>
+          <div class="orbit-core"><span class="pulse"></span><strong>OPS</strong><small>INTELLIGENCE</small></div>
+          <span class="orbit-label label-top">FORECAST</span>
+          <span class="orbit-label label-right">ANOMALY</span>
+          <span class="orbit-label label-bottom">CAUSE</span>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <aside class="control-panel">
+          <div class="section-eyebrow">01 / Ingest signal</div>
+          <h2>Bring your telemetry.</h2>
+          <p class="muted">Start with a timestamped CSV. ChronosOps will detect the schema and build an analysis brief.</p>
+          <form id="uploadForm" enctype="multipart/form-data">
+            <label class="dropzone" for="fileInput" id="dropzone">
+              <input id="fileInput" name="file" type="file" accept=".csv" required />
+              <span class="upload-icon">↑</span>
+              <strong id="fileName">Drop CSV here</strong>
+              <small>or click to browse · 50 MB max</small>
+            </label>
+            <div class="form-grid">
+              <label>
+                <span>Target signal <i>optional</i></span>
+                <input id="targetColumn" name="target_column" placeholder="e.g. request_latency" autocomplete="off" />
+              </label>
+              <label>
+                <span>Forecast steps</span>
+                <input id="forecastHorizon" name="forecast_horizon" type="number" min="1" max="120" value="12" />
+              </label>
+            </div>
+            <button class="primary-button" type="submit"><span>Run intelligence brief</span><b>↗</b></button>
+          </form>
+          <div id="status" class="status-line"><span class="status-icon">i</span> Waiting for a dataset.</div>
+          <div class="panel-footer"><span class="lock-icon">◈</span> Analysis stays in your local runtime.</div>
+        </aside>
+
+        <div class="workbench">
+          <div id="loadingState" class="loading-state d-none">
+            <div class="loading-spinner"></div>
+            <div><strong>Reading operational signal</strong><span>Profiling · forecasting · explaining</span></div>
+          </div>
+          <section id="emptyState" class="empty-state">
+            <div class="empty-grid">
+              <div class="empty-chart"><span></span><span></span><span></span><span></span><span></span></div>
+              <div>
+                <div class="section-eyebrow">02 / Intelligence brief</div>
+                <h2>Your control room is ready.</h2>
+                <p class="muted">Upload a dataset to populate a live operational readout. The dashboard compares multiple forecasting strategies instead of hiding behind a single score.</p>
+                <div class="empty-tags"><span>Data quality</span><span>Forecast confidence</span><span>Root cause</span></div>
+              </div>
+            </div>
+          </section>
+
+          <section id="dashboard" class="d-none">
+            <div class="brief-heading">
+              <div><div class="section-eyebrow">02 / Intelligence brief</div><h2>System readout <span id="analysisTimestamp"></span></h2></div>
+              <span class="confidence-badge"><span class="live-dot"></span> Analysis complete</span>
+            </div>
+            <div class="stat-grid">
+              <article class="stat-card stat-lime"><span class="stat-label">Signal health</span><strong id="qualityScore">—</strong><small>data quality score</small></article>
+              <article class="stat-card stat-dark"><span class="stat-label">Observations</span><strong id="rowsCount">—</strong><small>rows ingested</small></article>
+              <article class="stat-card stat-coral"><span class="stat-label">Focus signal</span><strong id="targetName">—</strong><small>forecast target</small></article>
+              <article class="stat-card stat-cream"><span class="stat-label">Model lead</span><strong id="bestModel">—</strong><small>lowest validation RMSE</small></article>
+            </div>
+
+            <div class="dashboard-grid grid-main">
+              <article class="surface chart-surface">
+                <div class="surface-heading"><div><span class="surface-index">A</span><h3>Forecast runway</h3></div><span class="surface-note">validation vs horizon</span></div>
+                <div id="forecastChart"></div>
+              </article>
+              <article class="surface intelligence-surface">
+                <div class="surface-heading"><div><span class="surface-index">B</span><h3>Signal pulse</h3></div><span class="surface-note">time-series diagnostics</span></div>
+                <ul id="tsInsights" class="insight-list"></ul>
+              </article>
+            </div>
+
+            <div class="dashboard-grid grid-main">
+              <article class="surface chart-surface">
+                <div class="surface-heading"><div><span class="surface-index">C</span><h3>Exception field</h3></div><span id="anomalyCount" class="surface-note">0 flagged events</span></div>
+                <div id="anomalyChart"></div>
+              </article>
+              <article class="surface cause-surface">
+                <div class="surface-heading"><div><span class="surface-index">D</span><h3>Likely contributors</h3></div><span class="surface-note">correlation ranking</span></div>
+                <ol id="rootCauseList" class="root-cause-list"></ol>
+              </article>
+            </div>
+
+            <div class="dashboard-grid grid-bottom">
+              <article class="surface">
+                <div class="surface-heading"><div><span class="surface-index">E</span><h3>Dataset profile</h3></div></div>
+                <div id="datasetProfile" class="metric-list"></div>
+              </article>
+              <article class="surface model-surface">
+                <div class="surface-heading"><div><span class="surface-index">F</span><h3>Model benchmark</h3></div><span class="surface-note">lower is better</span></div>
+                <div id="modelTable" class="table-wrap"></div>
+              </article>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="shell footer">
+      <span>CHRONOSOPS AI / OPERATIONAL INTELLIGENCE</span>
+      <span>Built by <strong>YOGESH R MEHTA</strong></span>
+      <a href="https://github.com/Yog-esh06/ChronoOps-AI" target="_blank" rel="noreferrer">github.com/Yog-esh06/ChronoOps-AI ↗</a>
+    </footer>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
